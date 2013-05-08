@@ -3,9 +3,9 @@
 [![Code Climate](https://codeclimate.com/github/swanson/stringer.png)](https://codeclimate.com/github/swanson/stringer)
 [![Coverage Status](https://coveralls.io/repos/swanson/stringer/badge.png?branch=master)](https://coveralls.io/r/swanson/stringer)
 
-### A [work-in-progress] self-hosted, anti-social RSS reader.
+### A [work-in-progress] self-hosted, minimally-social RSS reader.
 
-Stringer has no external dependencies, no social recommendations/sharing, and no fancy machine learning algorithms. 
+Stringer has no external dependencies, a small bit of social recommendations/sharing, and no fancy machine learning algorithms. 
 
 But it does have keyboard shortcuts and was made with love! 
 
@@ -24,7 +24,7 @@ Stringer is a Ruby app based on Sinatra, ActiveRecord, PostgreSQL, and DelayedJo
 Instructions are provided for deploying to Heroku (runs fine on the free plan) but Stringer can be deployed anywhere that supports Ruby.
 
 ```sh
-git clone git://github.com/swanson/stringer.git
+git clone git://github.com/darron/stringer.git
 cd stringer
 heroku create
 git push heroku master
