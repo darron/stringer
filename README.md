@@ -70,6 +70,14 @@ Target: your-heroku-instance.herokuapp.com
 
 Wait a few minutes for changes to progate.
 
+---
+
+Stringer has been translated to [several other languages](https://github.com/swanson/stringer/tree/master/config/locales). Your language can be set with the `LOCALE` environment variable.
+
+To set your locale on Heroku, run `heroku config:set LOCALE=en`.
+
+If you would like to translate Stringer to your preferred language, please open a pull request.
+
 # Development
 
 Run the tests with `rspec`.
@@ -96,3 +104,4 @@ General sexiness courtesy of [`Twitter Bootstrap`](http://twitter.github.io/boot
 
 # Contact
 Matt Swanson, [mdswanson.com](http://mdswanson.com) [@_swanson](http://twitter.com/_swanson)
+
