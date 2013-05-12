@@ -6,6 +6,10 @@ en:
       fields:
         feed_url: "Feed URL"
         submit: "Add"
+      flash:
+        added_successfully: "We've added your new feed. Check back in a bit."
+        already_subscribed_error: "You are already subscribed to this feed..."
+        feed_not_found_error: "We couldn't find that feed. Try again."
     index:
       add_some_feeds: "Hey, you should %{add} some feeds."
       add: "add"
@@ -19,30 +23,40 @@ en:
         password: "Password"
         password_confirmation: "Confirm"
         next: "Next"
+      flash:
+        passwords_dont_match: "Hey, your password confirmation didn't match. Try again."
   partials:
     action_bar:
       mark_all: "Mark all as read"
       refresh: "Refresh"
       view_feeds: "View feeds"
       add_feed: "Add a feed"
+      archived_stories: "Archived stories"
     feed:
       last_updated: "Last updated at"
+      status_bubble:
+        green: "Success!"
+        yellow: "Error parsing (probably temporary)"
+        red: "Error parsing (and it ain't never worked before, either)"
     feed_action_bar:
       home: "Return to Stories"
       feeds: "View feeds"
       add_feed: "Add a feed"
+      archived_stories: "Archived stories"
     shortcuts:
       title: "Keyboard shortcuts"
       keys:
         jk: "Next/previous story"
         oenter: "Toggle story open/closed"
+        or: "or"
         v: "Go to story URL"
         shifta: "Mark all as read"
         r: "Refresh"
     zen:
       zero: "You&#8217;ve reached RSS Zero&trade;"
-      gtfo: 'Now stop reading blogs and'
-      go_make: 'go make something'
+      gtfo: "Now stop reading blogs and"
+      go_make: "go make something"
+      archive: "view all items"
   sessions:
     new:
       title: 'Stringer speaks'
@@ -51,6 +65,11 @@ en:
       fields:
         password: "Password"
         submit: "Login"
+      flash:
+        wrong_password: "That's the wrong password. Try again."
+    destroy:
+      flash:
+        logged_out_successfully: "You have been signed out!"
   import:
     title: "Welcome aboard."
     subtitle: "Let's setup your feeds."
@@ -80,3 +99,8 @@ en:
     description: "We're getting you some stories to read, give us a second."
     start: "Start Reading"
     ready: "Okay, it's ready!"
+  archive:
+    next: "Next"
+    previous: "Previous"
+    of: "of"
+    sorry: "Sorry, you haven't read any stories yet!"

@@ -148,8 +148,8 @@ li.story.open .story-preview {
   white-space: nowrap;
 }
 
-.story-preview div, .feed-line div {
-  height: 30px;
+.tooltip {
+  white-space: pre-wrap;
 }
 
 .blog-title, .feed-title {
@@ -250,23 +250,13 @@ p.story-details {
   color: #7F8281;
 }
 
-li.feed .status {
-  height: 15px;
-  width: 15px;
-  display: inline-block;
-  line-height: 30px;
-  border-radius: 50px;
-  position: relative;
-  top: 2px;
-  left: 6px;
-}
-
 li.feed .feed-line {
   cursor: default;
 }
 
 li.feed .feed-title {
   display: inline-block;
+  margin-left: 0px;
 }
 
 li.feed .feed-title a {
@@ -284,16 +274,22 @@ li.feed .feed-title-container {
   white-space: nowrap;
 }
 
+li.feed .status {
+  padding: 8px;
+  width: 14px;
+  color: #ddd;
+}
+
 li.feed .status.green {
-  background: #2ECC71;
+  color: #2ECC71;
 }
 
 li.feed .status.yellow {
-  background: #F1C40F;
+  color: #F1C40F;
 }
 
 li.feed .status.red {
-  background: #E74C3C;
+  color: #E74C3C;
 }
 
 li.feed .feed-last-updated {
@@ -504,4 +500,26 @@ ul.shortcut-legend li {
 li.blank {
   list-style-type: none;
   height: 20px;
+}
+
+#zen a {
+  color: #F59745;
+  font-size: 14px;
+  border-bottom: 1px dotted #F59745;
+  text-decoration: none;
+}
+
+#zen .view-all {
+  line-height: 18px;
+}
+
+#pagination {
+  text-align: center;
+}
+
+#pagination a {
+  color: #F67100;
+  border-bottom: 1px dotted #F59745;
+  text-decoration: none;
+  margin: 0 7px;
 }
