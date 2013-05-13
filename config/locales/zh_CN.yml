@@ -47,7 +47,9 @@ zh_CN:
       title: "快捷键"
       keys:
         jk: "下一个/上一个故事"
+        np: "向上/向下移动"
         oenter: "点击打开/关闭"
+        m: "将一个条目标为已读/未读"
         or: "或"
         v: "转到原网址"
         shifta: "全部标为已读"
@@ -104,3 +106,22 @@ zh_CN:
     previous: "上一页"
     of: "of"
     sorry: "呃，你现在还没有已经读过的故事"
+  time:
+    formats:
+      default: "%b%d日 %H:%M"
+  date:
+    abbr_month_names:
+    -
+    - 一月
+    - 二月
+    - 三月
+    - 四月
+    - 五月
+    - 六月
+    - 七月
+    - 八月
+    - 九月
+    - 十月
+    - 十一月
+    - 十二月
+

@@ -1,84 +1,254 @@
-$(document).ready(function() {
-  var previous_req_id = 0;
-  $(".story-preview").click(function(e){ 
-    e.preventDefault();
+_.templateSettings = {
+  interpolate: /\{\{\=(.+?)\}\}/g,
+  evaluate: /\{\{(.+?)\}\}/g
+};
 
-    var $this = $(this);
-
-    var openStories = $("li.story.open");
-    
-    if(!$this.hasClass("open")) {
-      $this.trigger("openStory");
+var Story = Backbone.Model.extend({
+  defaults: function() {
+    return {
+      "open" : false,
+      "selected" : false
     }
+  },
 
-    openStories.trigger("closeStory");
-  });
-
-  $("li.story").on("closeStory", function(e) {
-    e.preventDefault();
-    var $this = $(this);
-
-    if($this.hasClass("open")) {
-      $this.removeClass("open");
-      $this.addClass("read");
-
-      $(".story-lead", this).show();
-      $(".story-body-container", this).stop().hide();
-    }
-  });
-
-  $("li.story").on("openStory", function(e) {
-    e.preventDefault();
-    var $this = $(this);
-
-    $this.addClass("open");
-
-    $(".story-lead", this).fadeOut(1000);
-    $(".story-body-container", this).stop().show();
-
-    var storyId = $this.data("id");
-
-    if (storyId > 0) {
-        $.post("/mark_as_read", { story_id: storyId })
-        .done(function() {
-            if(previous_req_id != storyId ){
-                var title = $("head > title")[0];
-                var stories_count = parseInt(title.text.match(/\d+/));
-                if (stories_count > 1){
-                    title.text = title.text.replace(/\d+/,stories_count - 1);
-                }else{
-                    title.text = title.text.replace("(1)","")
-                }
-                previous_req_id = storyId;
-            }
-        })
-        .fail(function() { alert("something broke!"); });
-    }
-  });
-
-  $("li.story").on("toggleStory", function(e) {
-    e.preventDefault();
-    var $this = $(this);
-
-    var openStories = $("li.story.open");
-
-    if($this.hasClass("open")) {
-      $this.trigger("closeStory");
+  toggle: function() {
+    if (this.get("open")) {
+      this.close();
     } else {
-      $this.trigger("openStory");
+      this.open();
+    }
+  },
+
+  shouldSave: function() {
+    return this.changedAttributes() && this.get("id") > 0;
+  },
+
+  open: function() {
+    if (!this.get("keep_unread")) this.set("is_read", true);
+    if (this.shouldSave()) this.save();
+    
+    this.collection.closeOthers(this);
+    this.collection.unselectAll();
+    this.collection.setSelection(this);
+
+    this.set("open", true);
+    this.set("selected", true);
+  },
+
+  toggleKeepUnread: function() {
+    if (this.get("keep_unread")) {
+      this.set("keep_unread", false);
+      this.set("is_read", true);
+    } else {
+      this.set("keep_unread", true);
+      this.set("is_read", false);
     }
 
-    openStories.trigger("closeStory");
+    if (this.shouldSave()) this.save();
+  },
+
+  close: function() {
+    this.set("open", false);
+  },
+
+  select: function() {
+    this.collection.unselectAll();
+    this.set("selected", true);
+  },
+
+  unselect: function() {
+    this.set("selected", false);
+  },
+
+  openInTab: function() {
+    window.open(this.get("permalink"), '_blank');
+  }
+});
+
+var StoryView = Backbone.View.extend({
+  tagName: "li",
+  className: "story",
+
+  template: "#story-template",
+
+  events: {
+    "click .story-preview" : "storyClicked",
+    "click .story-keep-unread" : "toggleKeepUnread"
+  },
+
+  initialize: function() {
+    this.template = _.template($(this.template).html());
+    this.listenTo(this.model, 'change', this.render);
+  },
+
+  render: function() {
+    this.$el.html(this.template(this.model.toJSON()));
+
+    this.$el.toggleClass("read", this.model.get("is_read"));
+
+    if (this.model.get("open")) {
+      this.$el.addClass("open");
+      $(".story-lead", this.$el).fadeOut(1000);
+    } else {
+      this.$el.removeClass("open");
+      $(".story-lead", this.$el).show();
+    }
+
+    this.$el.toggleClass("cursor", this.model.get("selected"));
+
+    return this;
+  },
+
+  storyClicked: function() {
+    this.model.toggle();
+    window.scrollTo(0, this.$el.offset().top);
+  },
+
+  toggleKeepUnread: function() {
+    this.model.toggleKeepUnread();
+  }
+});
+
+var StoryList = Backbone.Collection.extend({
+  model: Story,
+  url: "/stories",
+
+  initialize: function() {
+    this.cursorPosition = -1;
+  },
+
+  max_position: function() {
+    return this.length - 1;
+  },
+
+  unreadCount: function() {
+    return this.where({is_read: false}).length;
+  },
+
+  closeOthers: function(modelToSkip) {
+    this.each(function(model) {
+      if (model.id != modelToSkip.id) {
+        model.close();
+      }
+    });
+  },
+
+  selected: function() {
+    return this.where({selected: true});
+  },
+
+  unselectAll: function() {
+    _.invoke(this.selected(), "unselect");
+  },
+
+  selectedStoryId: function() {
+    var selectedStory = this.at(this.cursorPosition);
+    return selectedStory ? selectedStory.id : -1;
+  },
+
+  setSelection: function(model) {
+    this.cursorPosition = this.indexOf(model);
+  },
+
+  moveCursorDown: function() {
+    if (this.cursorPosition < this.max_position()) {
+      this.cursorPosition++;
+    }
+
+    this.at(this.cursorPosition).select();
+  },
+
+  moveCursorUp: function() {
+    if (this.cursorPosition > 0) {
+      this.cursorPosition--;
+    } else {
+      this.cursorPosition = this.max_position();
+    }
+
+    this.at(this.cursorPosition).select();
+  },
+
+  openCurrentSelection: function() {
+    this.at(this.cursorPosition).open();
+  },
+
+  toggleCurrent: function() {
+    if (this.cursorPosition < 0) this.cursorPosition = 0;
+    this.at(this.cursorPosition).toggle();
+  },
+
+  viewCurrentInTab: function() {
+    if (this.cursorPosition < 0) this.cursorPosition = 0;
+    this.at(this.cursorPosition).openInTab();
+  },
+
+  toggleCurrentKeepUnread: function() {
+    if (this.cursorPosition < 0) this.cursorPosition = 0;
+    this.at(this.cursorPosition).toggleKeepUnread();
+  }
+});
+
+var AppView = Backbone.View.extend({
+  el: "#stories",
+
+  initialize: function(collection) {
+    this.stories = collection;
+    this.el = $(this.el);
+
+    this.listenTo(this.stories, 'add', this.addOne);
+    this.listenTo(this.stories, 'reset', this.addAll);
+    this.listenTo(this.stories, 'all', this.render);
+  },
+
+  loadData: function(data) {
+    this.stories.reset(data);
+  },
+
+  render: function() {
+    var unreadCount = this.stories.unreadCount();
     
-    window.scrollTo(0, $this.offset().top);
-  });
+    if (unreadCount === 0) {
+      document.title = window.i18n.titleName;
+    } else {
+      document.title = "(" + unreadCount + ") " + window.i18n.titleName;
+    }
+  },
 
-  $("#mark-all").click(function(e) {
-    e.preventDefault();
+  addOne: function(story) {
+    var view = new StoryView({model: story});
+    this.$("#story-list").append(view.render().el);
+  },
 
-    $("form#mark-all-as-read").submit();
-  });
+  addAll: function() {
+    this.stories.each(this.addOne, this);
+  },
 
+  moveCursorDown: function() {
+    this.stories.moveCursorDown();
+  },
+
+  moveCursorUp: function() {
+    this.stories.moveCursorUp();
+  },
+
+  openCurrentSelection: function() {
+    this.stories.openCurrentSelection();
+  },
+
+  toggleCurrent: function() {
+    this.stories.toggleCurrent();
+  },
+
+  viewCurrentInTab: function() {
+    this.stories.viewCurrentInTab();
+  },
+
+  toggleCurrentKeepUnread: function() {
+    this.stories.toggleCurrentKeepUnread();
+  }
+});
+
+$(document).ready(function() {
   $(".remove-feed").click(function(e) {
     e.preventDefault();
     var $this = $(this);
@@ -98,65 +268,5 @@ $(document).ready(function() {
 
   Mousetrap.bind("?", function() {
     $("#shortcuts").modal('toggle');
-  });
-
-  var cursorPosition = -1;
-  var MAX_POSITION = $("li.story").size();
-
-  var Stringer = {
-    setCursorPosition: function(position) {
-      if (position < 0) position = 0;
-
-      var stories = $("li.story");
-      stories.removeClass("cursor");
-      stories.eq(position).addClass("cursor");
-    },
-
-    currentlySelectedStory: function() {
-      position = cursorPosition;
-      if (position < 0) position = 0;
-
-      return $("li.story").eq(position);
-    }
-  };
-
-  Mousetrap.bind("j", function() {
-    if (cursorPosition < MAX_POSITION - 1) {
-      Stringer.setCursorPosition(++cursorPosition)
-      Stringer.currentlySelectedStory().trigger("toggleStory");
-    }
-  });
-
-  Mousetrap.bind("k", function() {
-    if (cursorPosition > 0) {
-      Stringer.setCursorPosition(--cursorPosition);
-      Stringer.currentlySelectedStory().trigger("toggleStory");
-    } else {
-      cursorPosition = 0;
-      
-      Stringer.setCursorPosition(cursorPosition);
-      Stringer.currentlySelectedStory().trigger("openStory");
-    }
-  });
-
-  Mousetrap.bind(["o", "enter"], function() {
-    Stringer.currentlySelectedStory().trigger("toggleStory");
-    Stringer.setCursorPosition(cursorPosition);
-  });
-
-  Mousetrap.bind("r", function() {
-    var refresh = $("a#refresh")[0];
-    if (refresh) refresh.click();
-  });
-
-  Mousetrap.bind("shift+a", function() {
-    $("form#mark-all-as-read").submit();
-  });
-
-  Mousetrap.bind(["b","v"], function() {
-    var currentStory = Stringer.currentlySelectedStory();
-    var permalink = currentStory.find("a.story-permalink")[0];
-
-    if (permalink) window.open(permalink.href, '_blank');
   });
 });

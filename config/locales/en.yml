@@ -13,6 +13,8 @@ en:
     index:
       add_some_feeds: "Hey, you should %{add} some feeds."
       add: "add"
+  stories:
+    keep_unread: "Keep unread"
   first_run:
     password:
       title: 'Stringer is'
@@ -38,6 +40,8 @@ en:
         green: "Success!"
         yellow: "Error parsing (probably temporary)"
         red: "Error parsing (and it ain't never worked before, either)"
+      last_fetched:
+        never: "Never"
     feed_action_bar:
       home: "Return to Stories"
       feeds: "View feeds"
@@ -47,7 +51,9 @@ en:
       title: "Keyboard shortcuts"
       keys:
         jk: "Next/previous story"
+        np: "Move down/move up"
         oenter: "Toggle story open/closed"
+        m: "Mark item as read/unread"
         or: "or"
         v: "Go to story URL"
         shifta: "Mark all as read"
@@ -104,3 +110,21 @@ en:
     previous: "Previous"
     of: "of"
     sorry: "Sorry, you haven't read any stories yet!"
+  time:
+    formats:
+      default: "%b %d, %H:%M"
+  date:
+    abbr_month_names:
+    -
+    - Jan
+    - Feb
+    - Mar
+    - Apr
+    - May
+    - Jun
+    - Jul
+    - Aug
+    - Sep
+    - Oct
+    - Nov
+    - Dec

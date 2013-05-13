@@ -13,6 +13,8 @@ sv:
     index:
       add_some_feeds: "Hej, du borde %{add} några feeds."
       add: "lägga till"
+  stories:
+    keep_unread: "Behåll oläst"
   first_run:
     password:
       title: 'Stringer är'
@@ -104,3 +106,21 @@ sv:
     previous: "Föregående"
     of: "av"
     sorry: "Tyvärr, du har inte läst några berättelser än!"
+  time:
+    formats:
+      default: "%e %berättelser %H:%M"
+  date:
+    abbr_month_names:
+    -
+    - jan
+    - feb
+    - mar
+    - apr
+    - maj
+    - jun
+    - jul
+    - aug
+    - sep
+    - okt
+    - nov
+    - dec

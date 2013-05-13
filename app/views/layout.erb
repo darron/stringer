@@ -7,12 +7,19 @@
     </title>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <link rel="shortcut icon" href="/img/favicon.png">
-
     <link href="http://fonts.googleapis.com/css?family=Lato:300,400,700,900,400italic" rel="stylesheet" type="text/css">
     
-    <%= css :application %>
+    <link rel="stylesheet" type="text/css" href="/css/bootstrap-min.css">
+    <link rel="stylesheet" type="text/css" href="/css/flat-ui-no-icons.css">
+    <link rel="stylesheet" type="text/css" href="/css/font-awesome-min.css">
+    <link rel="stylesheet" type="text/css" href="/css/styles.css">
 
-    <%= js  :application %>
+    <script type="text/javascript" src="/js/jquery-min.js"></script>
+    <script type="text/javascript" src="/js/mousetrap-min.js"></script>
+    <script type="text/javascript" src="/js/bootstrap-min.js"></script>
+    <script type="text/javascript" src="/js/underscore-min.js"></script>
+    <script type="text/javascript" src="/js/backbone-min.js"></script>
+    <script type="text/javascript" src="/js/app.js"></script>
 
     <%= yield_content :head %>
   </head>
@@ -34,27 +41,12 @@
     </div>
 
     <div id="footer">
-      <div class="container">
-        <div class="row-fluid">
-          <div class="span6">
-            <ul class="footer-links">
-              <% if current_user %>
-                <li><a href="/logout"><%= t('layout.logout') %></a></li>
-                <li class="muted">·</li>
-                <li><a href="/feeds/export"><%= t('layout.export') %></a></li>
-                <li class="muted">·</li>
-              <% end %>
-
-              <li><a href="https://github.com/swanson/stringer"><%= t('layout.support') %></a></li>
-            </ul>
-          </div>
-          <div class="span6">
-            <p class="pull-right">
-              <b><%= t('layout.hey') %></b> <%= t('layout.back_to_work') %>
-            </p>
-          </div>
-        </div>
-      </div>
+      <%= render_partial :footer %>
     </div>
+    
+    <script>
+      window.i18n = {};
+      window.i18n.titleName = "<%= t('layout.title') %>";
+    </script>
   </body>
 </html>
