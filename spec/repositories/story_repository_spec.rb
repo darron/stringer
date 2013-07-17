@@ -33,6 +33,25 @@ describe StoryRepository do
     it "handles empty body" do
       StoryRepository.expand_absolute_urls("", nil).should eq ""
     end
+
+    it "doesn't modify tags that do not have url attributes" do
+      content = <<-EOS
+<div>
+<img foo="bar">
+<a name="something"/></a>
+<video foo="bar"></video>
+</div>
+      EOS
+
+      result = StoryRepository.expand_absolute_urls(content, "http://oodl.io/d/")
+      result.gsub(/\n/, "").should eq <<-EOS.gsub(/\n/, "")
+<div>
+<img foo="bar">
+<a name="something"></a>
+<video foo="bar"></video>
+</div>
+      EOS
+    end
   end
 
   describe ".extract_content" do
@@ -53,6 +72,15 @@ describe StoryRepository do
 
     it "falls back to summary if there is no content" do
       StoryRepository.extract_content(summary_only).should eq "Dumb publisher"
+    end
+  end
+
+  describe ".sanitize" do
+    context "regressions" do
+      it "handles <wbr> tag properly" do
+        result = StoryRepository.sanitize("<code>WM_<wbr>ERROR</code> asdf")
+        result.should eq "<code>WM_ERROR</code> asdf"
+      end
     end
   end
 end
