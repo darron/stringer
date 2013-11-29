@@ -5,6 +5,9 @@ require_relative "../repositories/feed_repository"
 require_relative "../commands/feeds/find_new_stories"
 
 class FetchFeed
+
+  USER_AGENT = "Stringer (https://github.com/swanson/stringer)"
+
   def initialize(feed, feed_parser = Feedzirra::Feed, logger = nil)
     @feed = feed
     @parser = feed_parser
@@ -13,13 +16,18 @@ class FetchFeed
 
   def fetch
     begin
-      raw_feed = @parser.fetch_and_parse(@feed.url, user_agent: "Stringer", if_modified_since: @feed.last_fetched)
+      raw_feed = @parser.fetch_and_parse(@feed.url, user_agent: USER_AGENT, if_modified_since: @feed.last_fetched, timeout: 30, max_redirects: 2)
 
-      new_entries_from(raw_feed).each do |entry|
-        StoryRepository.add(entry, @feed)
+      if raw_feed == 304
+        @logger.info "#{@feed.url} has not been modified since last fetch" if @logger
+      else
+        new_entries_from(raw_feed).each do |entry|
+          StoryRepository.add(entry, @feed)
+        end
+
+        FeedRepository.update_last_fetched(@feed, raw_feed.last_modified)
       end
 
-      FeedRepository.update_last_fetched(@feed, raw_feed.last_modified)
       FeedRepository.set_status(:green, @feed)
     rescue Exception => ex
       FeedRepository.set_status(:red, @feed)
@@ -30,11 +38,11 @@ class FetchFeed
 
   private
   def new_entries_from(raw_feed)
-    finder = FindNewStories.new(raw_feed, @feed.last_fetched, latest_url)
+    finder = FindNewStories.new(raw_feed, @feed.last_fetched, latest_entry_id)
     finder.new_stories
   end
 
-  def latest_url
-    return @feed.stories.first.permalink unless @feed.stories.empty?
+  def latest_entry_id
+    return @feed.stories.first.entry_id unless @feed.stories.empty?
   end
 end

@@ -9,7 +9,8 @@ class StoryRepository
                 body: extract_content(entry),
                 is_read: false,
                 is_starred: false,
-                published: entry.published || Time.now)
+                published: entry.published || Time.now,
+                entry_id: entry.id)
   end
 
   def self.fetch(id)
@@ -25,6 +26,11 @@ class StoryRepository
     Story.where("created_at < ? AND is_read = ?", timestamp, false)
   end
 
+  def self.fetch_unread_for_feed_by_timestamp(feed_id, timestamp)
+    timestamp = Time.at(timestamp.to_i)
+    Story.where(feed_id: feed_id).where("created_at < ? AND is_read = ?", timestamp, false)
+  end
+
   def self.save(story)
     story.save
   end
@@ -37,6 +43,10 @@ class StoryRepository
     unread.where('id > ?', since_id)
   end
 
+  def self.feed(feed_id)
+    Story.where('feed_id = ?', feed_id).order("published desc").includes(:feed)
+  end
+
   def self.read(page = 1)
     Story.where(is_read: true).includes(:feed)
       .order("published desc").page(page).per_page(20)
@@ -45,6 +55,10 @@ class StoryRepository
   def self.starred(page = 1)
     Story.where(is_starred: true).includes(:feed)
           .order("published desc").page(page).per_page(20)
+  end
+
+  def self.all_starred
+    Story.where(is_starred: true)
   end
 
   def self.unstarred_read_stories_older_than(num_days)

@@ -100,7 +100,11 @@ var StoryView = Backbone.View.extend({
   },
 
   render: function() {
-    this.$el.html(this.template(this.model.toJSON()));
+    var jsonModel = this.model.toJSON();
+    this.$el.html(this.template(jsonModel));
+    if (jsonModel.is_read) {
+      this.$el.addClass('read');
+    }
     return this;
   },
 
@@ -134,9 +138,17 @@ var StoryView = Backbone.View.extend({
     this.$(".story-starred > i").attr("class", icon);
   },
 
-  storyClicked: function() {
-    this.model.toggle();
-    window.scrollTo(0, this.$el.offset().top);
+  storyClicked: function(e) {
+    if (e.metaKey || e.ctrlKey || e.which == 2) {
+      var background_tab = window.open(this.model.get("permalink"));
+      background_tab.blur();
+      window.focus();
+      if (!this.model.get("keep_unread")) this.model.set("is_read", true);
+      if (this.model.shouldSave()) this.model.save();
+    } else {
+      this.model.toggle();
+      window.scrollTo(0, this.$el.offset().top);
+    }
   },
 
   toggleKeepUnread: function() {
@@ -253,7 +265,7 @@ var AppView = Backbone.View.extend({
 
   render: function() {
     var unreadCount = this.stories.unreadCount();
-    
+
     if (unreadCount === 0) {
       document.title = window.i18n.titleName;
     } else {

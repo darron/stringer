@@ -21,7 +21,7 @@ The app is currently under active development, please try it out and report any 
 
 Stringer is a Ruby app based on Sinatra, ActiveRecord, PostgreSQL, Backbone.js and DelayedJob.
 
-Instructions are provided for deploying to Heroku (runs fine on the free plan) but Stringer can be deployed anywhere that supports Ruby (setup instructions for a Linux-based VPS are provided [here](/VPS.md)).
+Instructions are provided for deploying to Heroku (runs fine on the free plan) but Stringer can be deployed anywhere that supports Ruby (setup instructions for a Linux-based VPS are provided [here](/VPS.md), and for OpenShift, provided [here](/OpenShift.md)).
 
 ```sh
 git clone git://github.com/darron/stringer.git
@@ -29,6 +29,7 @@ cd stringer
 heroku create
 git push heroku master
 
+heroku config:set APP_URL=`heroku apps:info | grep -o 'http[^"]*'`
 heroku config:set SECRET_TOKEN=`openssl rand -hex 20`
 
 heroku run rake db:migrate
@@ -129,8 +130,6 @@ task.
 Run the Ruby tests with `rspec`. 
 
 Run the Javascript tests with `rake test_js` and then open a browser to `http://localhost:4567/test`.
-
-In development, stringer uses `sqlite` - there are issues with locking if you run background jobs at the same time as queries are being made via the web app. If you run into these, consider using `pg` locally.
 
 ## Getting Started
 
