@@ -1,8 +1,13 @@
-require "sinatra/activerecord/rake"
-require "rubygems"
 require "bundler"
+Bundler.setup
+
+require "rubygems"
 require "net/http"
-Bundler.require
+require 'active_record'
+require 'delayed_job'
+require 'delayed_job_active_record'
+
+require "sinatra/activerecord/rake"
 
 require "./app"
 require_relative "./app/jobs/fetch_feed_job"
@@ -149,7 +154,7 @@ task :deploy do
 
   #heroku addons:open scheduler
   Formatador.display_lines([
-    "[negative]<> Add `[bold]rake fetch_feeds[/][negative]` hourly task at [underline]https://api.heroku.com/apps/#{app_data['id']}/addons/scheduler:standard[/]",
+    "[negative]<> Add `[bold]rake lazy_fetch[/][negative]` hourly task at [underline]https://api.heroku.com/apps/#{app_data['id']}/addons/scheduler:standard[/]",
     "[negative]<> Impatient? After adding feeds, immediately fetch the latest with `heroku run rake fetch_feeds -a #{app_data['name']}`",
     "[negative]<> stringer available at [underline]#{app_data['web_url']}[/]"
   ])

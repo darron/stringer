@@ -15,13 +15,11 @@ When `BIG_FREE_READER` shuts down, your instance of Stringer will still be kicki
 ![](screenshots/stories.png)
 ![](screenshots/feed.png)
 
-The app is currently under active development, please try it out and report any issues you have.
-
 # Installation
 
-Stringer is a Ruby app based on Sinatra, ActiveRecord, PostgreSQL, Backbone.js and DelayedJob.
+Stringer is a Ruby (2.0.0+) app based on Sinatra, ActiveRecord, PostgreSQL, Backbone.js and DelayedJob.
 
-Instructions are provided for deploying to Heroku (runs fine on the free plan) but Stringer can be deployed anywhere that supports Ruby (setup instructions for a Linux-based VPS are provided [here](/VPS.md), and for OpenShift, provided [here](/OpenShift.md)).
+Instructions are provided for deploying to Heroku (runs fine on the free plan) but Stringer can be deployed anywhere that supports Ruby (setup instructions for a Linux-based VPS are provided [here](/docs/VPS.md), and for OpenShift, provided [here](/docs/OpenShift.md)).
 
 ```sh
 git clone git://github.com/darron/stringer.git
@@ -39,7 +37,7 @@ heroku addons:add scheduler
 heroku addons:open scheduler
 ```
 
-Add an hourly task that runs `rake fetch_feeds`
+Add an hourly task that runs `rake lazy_fetch` (if you are not on Heroku you may want `rake fetch_feeds` instead).
 
 Load the app and follow the instructions to import your feeds and start using the app.
 
@@ -85,8 +83,6 @@ Wait a few minutes for changes to propagate.
 
 ---
 
-ReederApp Support (experimental)
-
 Stringer implements a clone of [Fever's API](http://www.feedafever.com/api) so it can be used with any mobile client that supports Fever.
 
 ![image](https://f.cloud.github.com/assets/56947/546236/68456536-c288-11e2-834b-9043dc75a087.png)
@@ -100,7 +96,7 @@ Email: stringer (case-sensitive)
 Password: {your-stringer-password}
 ```
 
-Currently, only reading is supported and this is kind of a hack so please report any issues you run into. If you have previously setup Stringer, you will need to migrate your database and run `rake change_password` for the API key to be setup properly.
+If you have previously setup Stringer, you will need to migrate your database and run `rake change_password` for the API key to be setup properly.
 
 ---
 
